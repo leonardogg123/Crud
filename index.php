@@ -13,20 +13,31 @@ if(isset($_GET['action'])){
             $rows = $crud->read();
             break;
 
-            case'read':
+        case'read':
+            $rows = $crud->read();
+            break;
+
+    //case update
+            case 'update' :
+                if(isset($_POST['id'])){
+                    $crud->update($_POST);
+                }
                 $rows = $crud->read();
                 break;
 
-    
-    //case update
-
     //case delete
+    case 'delete':
+        $crud->delete($_GET['id']);
+        $rows = $crud->read();
+        break;
 
     default:
     $rows = $crud->read();
     break;
 
     }
+}else{
+    $rows = $crud->read();
 }
 
 ?>
@@ -125,7 +136,7 @@ if(isset($_GET['action'])){
                 $id = $_GET['id'];
                 $result =$crud->readOne($id);
 
-        if($result){
+        if(!$result){
             echo "Registro não encontrado.";
             exit();
         }
@@ -139,9 +150,34 @@ if(isset($_GET['action'])){
         
     ?>
 
+       <form action="?action=update" method="POST">
+            <input type="hidden" name="id" value="<?php echo $id ?>">
+            <label for="modelo"> Modelo </label>
+            <input type="text" name="modelo" value="<?php echo $modelo ?>">
+
+            <label for="marca"> Marca </label>
+            <input type="text" name="marca" value="<?php echo $marca ?>">
+
+            <label for="placa"> Placa </label>
+            <input type="text" name="placa" value="<?php echo $placa ?>">
+
+            <label for="cor"> Cor </label>
+            <input type="text" name="cor" value="<?php echo $cor ?>">
+
+            <label for="ano"> Ano </label>
+            <input type="text" name="ano" value="<?php echo $ano ?>">
+
+            <input type="submit" value="Atualizar" name="enviar" onclick="return confirm('Certeza que deseja atualizar?')">
+
         
+        </form>
 
-
+            <?php
+        }else{
+        
+        
+            
+            ?>
 
 
 
@@ -163,9 +199,15 @@ if(isset($_GET['action'])){
         <label for="">Ano</label>
          <input type="text" name="ano">
 
-          <input type="submit" value="cadastrar" name="enviar"></input>
+          <input type="submit" value="cadastrar" name="enviar">
           
     </form>
+    <?php
+        }
+    
+    ?>
+
+
     <table>
           <tr>
             <td>id</td>
@@ -175,31 +217,32 @@ if(isset($_GET['action'])){
             <td>cor</td>
             <td>ano</td>
             <td>ações</td>
-    </tr>
+        </tr>
     <?php
-            if($rows->rowCount() == 0){
-                echo "<tr>";
-                echo "<td colspan='7'>Nenhum dado encontrado</td>";
-                echo "</tr>";
-            } else {
-                while($row = $rows->fetch(PDO::FETCH_ASSOC)){
-                    echo "<tr>";
-                    echo "<td>" . $row['id'] . "</td>";
-                    echo "<td>" . $row['marca'] . "</td>";
-                    echo "<td>" . $row['placa'] . "</td>";
-                    echo "<td>" . $row['cor'] . "</td>";
-                    echo "<td>" . $row['ano'] . "</td>";
-                    echo "<td>";
-                    echo "<a href='?action=update&id=" . $row['id'] . "'>Update</a>";
-                    echo "<a href='?action=delete&id=" . $row['id'] . "' onclick='return confirm(\"Tem certeza que quer apagar esse registro?\")' class='delete'>Delete</a>";
-                    echo "</td>";
-                    echo "</tr>";
-                }
-            }
-        ?>
+    if($rows->rowCount() == 0){
+        echo "<tr>";
+        echo "<td colspan='7'>Nenhum dado encontrado</td>";
+        echo "</tr>";
+    }else{
+        while($row = $rows->fetch(PDO::FETCH_ASSOC)){
+            echo "<tr>";
+            echo "<td>" . $row['id'] . "</td>";
+            echo "<td>" . $row['modelo'] . "</td>";
+            echo "<td>" . $row['marca'] . "</td>";
+            echo "<td>" . $row['placa'] . "</td>";
+            echo "<td>" . $row['cor'] . "</td>";
+            echo "<td>" . $row['ano'] . "</td>";
+            echo "<td>";
+            echo "<a href='?action=update&id=" . $row['id'] . "'>Update</a>";
+            echo "<a href='?action=delete&id=" . $row['id'] . "' onclick='return confirm(\"Tem certeza que quer apagar esse registro?\")' class='delete'>Delete</a>";
+            echo "</td>";
+            echo "</tr>";
+        }
+    }
+?>
 
     
-          </table>
+    </table>
 
 </body>
 </html>
