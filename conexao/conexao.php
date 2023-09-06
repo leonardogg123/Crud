@@ -1,9 +1,9 @@
 <?php
 class Database{
-    private $host = "localhost";
-    private $db_name = "aula3crud";
-    private $username = "root";
-    private $senha="";
+    private $host = "localhost"; // nome do servidor do mysql local
+    private $db_name = "zoologico"; //nome do nosso banco de dados
+    private $username = "root";//usuario padrao do xampp
+    private $senha="";//senha padro do xampp
     private $conn;
     
 public function getConnection(){

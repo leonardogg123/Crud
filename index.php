@@ -2,22 +2,25 @@
 require_once('classes/Crud.php');
 require_once('conexao/conexao.php');
 
-$database = new Database();
-$db = $database->getConnection();
-$crud = new Crud($db);
+//estabelecendo uma conexão com o banco de dados, e depois criando uma instância de uma classe chamada "Crud";
+$database = new Database();// Isso cria um "gerenciador de conexão" que nos permite se comunicar com um banco de dados.
+$db = $database->getConnection(); // É como abrir uma linha telefônica para conversar com o banco de dados.
+$crud = new Crud($db);//criando uma ferramenta que nos ajuda a realizar ações no banco de dados, como adicionar, ler, atualizar ou excluir informações
+
 
 if(isset($_GET['action'])){
-    switch($_GET['action']){
-        case 'create':
+    switch($_GET['action']){ //switch  avalia o valor de $_GET['action'] para determinar qual caso deve ser executado.
+        case 'create': // Se $_GET['action'] for igual a 'create', então chama a função $crud->create($_POST);. Isso provavelmente cria um novo registro no banco de dados com os dados que foram enviados via POST (geralmente a partir de um formulário HTML).
             $crud->create($_POST);
             $rows = $crud->read();
             break;
 
-        case'read':
-            $rows = $crud->read();
-            break;
+            case 'read': // Se $_GET['action'] for igual a 'read', então chama a função $crud->read();. Isso provavelmente lê informações do banco de dados.
+                $rows = $crud->read();
+                break;
 
-    //case update
+            //case update Se $_GET['action'] for igual a 'update', verifica se $_POST['id'] está definido (o ID do registro a ser atualizado). Se estiver definido, chama $crud->update($_POST); para atualizar o registro no banco de dados com os dados enviados via POST. Em seguida, lê as informações atualizadas do banco de dados.
+
             case 'update' :
                 if(isset($_POST['id'])){
                     $crud->update($_POST);
@@ -25,23 +28,20 @@ if(isset($_GET['action'])){
                 $rows = $crud->read();
                 break;
 
-    //case delete
-    case 'delete':
-        $crud->delete($_GET['id']);
-        $rows = $crud->read();
-        break;
+            //case delete Se $_GET['action'] for igual a 'delete', chama $crud->delete($_GET['id']); para excluir o registro com o ID especificado na URL. Em seguida, lê as informações atualizadas do banco de dados.
+            case 'delete':
+                $crud->delete($_GET['id']);
+                $rows = $crud->read();
+                break;
 
-    default:
-    $rows = $crud->read();
-    break;
-
+            default: //Se $_GET['action'] não corresponder a nenhum dos casos anteriores, ele cai no bloco padrão e executa $crud->read(); para ler informações do banco de dados.
+            $rows = $crud->read();
+            break;
     }
 }else{
-    $rows = $crud->read();
-}
-
+        $rows = $crud->read(); //se caso der errado ele chama o read para ler o banco dados
+    }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -119,106 +119,100 @@ if(isset($_GET['action'])){
 </body>
 </html>
 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>crud</title>
+    <title>Reescrita do Crud</title>
 </head>
 <body>
-
-    <?php
-        
+    <?php //isset Verifica se o parâmetro 'action' foi passado na URL.
     if(isset($_GET['action']) && $_GET['action'] == 'update' && isset($_GET['id'])){
-                $id = $_GET['id'];
-                $result =$crud->readOne($id);
+        $id = $_GET['id']; //obtem o id e armazena a variavel id
+        $result = $crud->readOne($id); // Chama uma função chamada readOne($id) provavelmente definida na classe $crud. Essa função provavelmente consulta o banco de dados em busca de um registro com o ID especificado e retorna as informações desse registro.
 
         if(!$result){
             echo "Registro não encontrado.";
             exit();
-        }
+        }//Verifica se o resultado da consulta ($result) é falso, o que significa que o registro com o ID especificado não foi encontrado no banco de dados
 
-        $modelo = $result['modelo'];
-        $marca = $result['marca'];
-        $placa = $result['placa'];
-        $cor = $result['cor'];
-        $ano = $result['ano'];
-    
+
+        //quando encontrado ele armazenado separadamente modelo,marca etc
+        $especie = $result['especie'];
+        $comportamento = $result['comportamento'];
+        $locomocao = $result['locomocao'];
+        $sexo = $result['sexo'];
+        $ducha = $result['ducha'];
+
+        //obs:Em resumo, esse trecho de código PHP é responsável por verificar se um registro específico deve ser atualizado (com base no valor 'update' passado na URL) e, se sim, obter os dados desse registro do banco de dados para uso posterior na página. Se o registro não for encontrado, ele exibe uma mensagem de erro e encerra o script.
+        ?>
+        <!--esse formulario é usado para editar informações de um registro específico no banco de dados. -->
         
-    ?>
+        <form acion="?action=update" method="POST"><!-- Este é o elemento de formulário. Ele define que, quando o formulário for enviado, ele enviará os dados para a mesma página com o parâmetro action definido como 'update' na URL. Isso provavelmente indica que o formulário será usado para atualizar um registro existente.-->
+        <input type="hidden" name="id" value="<?php echo $id ?>"><!--Este é um campo de entrada oculto (hidden input) que contém o ID do registro que está sendo atualizado. O valor desse campo é definido como o valor da variável $id que foi obtida anteriormente. Isso permite que o sistema saiba qual registro deve ser atualizado no banco de dados. -->
+            <label for="especie"> Especie</label><!--Isso cria um rótulo para o campo de entrada seguinte. O for atributo corresponde ao id do campo de entrada associado.-->
+            <input type="text" name="especie" value="<?php echo $especie ?>"><!--Este é um campo de entrada de texto que permite editar o valor do campo "modelo". O valor desse campo é definido como o valor da variável $modelo, que contém o valor atual do campo no registro do banco de dados.-->
 
-       <form action="?action=update" method="POST">
-            <input type="hidden" name="id" value="<?php echo $id ?>">
-            <label for="modelo"> Modelo </label>
-            <input type="text" name="modelo" value="<?php echo $modelo ?>">
+            <label for="comportamento"> Comportamento </label>
+            <input type="text" name="comportamento" value="<?php echo $comportamento ?>">
 
-            <label for="marca"> Marca </label>
-            <input type="text" name="marca" value="<?php echo $marca ?>">
+            <label for="locomocao"> Placa </label>
+            <input type="text" name="locomocao" value="<?php echo $locomocao ?>">
 
-            <label for="placa"> Placa </label>
-            <input type="text" name="placa" value="<?php echo $placa ?>">
+            <label for="sexo"> Cor </label>
+            <input type="text" name="sexo" value="<?php echo $sexo ?>">
 
-            <label for="cor"> Cor </label>
-            <input type="text" name="cor" value="<?php echo $cor ?>">
-
-            <label for="ano"> Ano </label>
-            <input type="text" name="ano" value="<?php echo $ano ?>">
+            <label for="ducha"> Ano </label>
+            <input type="text" name="ducha" value="<?php echo $ducha ?>">
 
             <input type="submit" value="Atualizar" name="enviar" onclick="return confirm('Certeza que deseja atualizar?')">
-
+            <!--Este é um botão de envio do formulário. Quando clicado, ele envia os dados do formulário para a mesma página com a ação de 'update'. O onclick atributo exibe uma confirmação antes de enviar os dados, para garantir que o usuário realmente deseja atualizar o registro.-->
         
         </form>
 
-            <?php
-        }else{
+        <?php
         
-        
-            
-            ?>
+    }else{
+        ?>
 
+<form action="?action=create" method="POST"><!--Ele define que, quando o formulário for enviado, ele enviará os dados para a mesma página com o parâmetro action definido como 'create-->
 
+<label for="">Especie</label>
+ <input type="text" name="especie"><!--deixa tu escrever-->
 
+<label for="">Comportamento</label>
+<input type="text" name="comportamento">
 
-    <form action="?action=create" method="POST">
+<label for="">Locomoção</label>
+ <input type="text" name="locomocao">
 
-        <label for="">Modelo</label>
-         <input type="text" name="modelo">
+<label for="">Sexo</label>
+ <input type="text" name="sexo">
 
-        <label for="">Marca</label>
-        <input type="text" name="marca">
+<label for="">Ducha</label>
+ <input type="text" name="ducha">
 
-        <label for="">Placa</label>
-         <input type="text" name="placa">
+  <input type="submit" value="cadastrar" name="enviar">
+  
+</form>
+<?php
+}
 
-        <label for="">Cor</label>
-         <input type="text" name="cor">
+?>
 
-        <label for="">Ano</label>
-         <input type="text" name="ano">
-
-          <input type="submit" value="cadastrar" name="enviar">
-          
-    </form>
-    <?php
-        }
-    
-    ?>
-
-
-    <table>
+<!--tabela para aparecer lá-->
+<table>
           <tr>
             <td>id</td>
-            <td>modelo</td>
-            <td>marca</td>
-            <td>placa</td>
-            <td>cor</td>
-            <td>ano</td>
+            <td>especie</td>
+            <td>comportamento</td>
+            <td>locomocao</td>
+            <td>sexo</td>
+            <td>ducha</td>
             <td>ações</td>
         </tr>
-    <?php
+<?php
     if($rows->rowCount() == 0){
         echo "<tr>";
         echo "<td colspan='7'>Nenhum dado encontrado</td>";
@@ -227,11 +221,11 @@ if(isset($_GET['action'])){
         while($row = $rows->fetch(PDO::FETCH_ASSOC)){
             echo "<tr>";
             echo "<td>" . $row['id'] . "</td>";
-            echo "<td>" . $row['modelo'] . "</td>";
-            echo "<td>" . $row['marca'] . "</td>";
-            echo "<td>" . $row['placa'] . "</td>";
-            echo "<td>" . $row['cor'] . "</td>";
-            echo "<td>" . $row['ano'] . "</td>";
+            echo "<td>" . $row['especie'] . "</td>";
+            echo "<td>" . $row['comportamento'] . "</td>";
+            echo "<td>" . $row['locomocao'] . "</td>";
+            echo "<td>" . $row['sexo'] . "</td>";
+            echo "<td>" . $row['ducha'] . "</td>";
             echo "<td>";
             echo "<a href='?action=update&id=" . $row['id'] . "'>Update</a>";
             echo "<a href='?action=delete&id=" . $row['id'] . "' onclick='return confirm(\"Tem certeza que quer apagar esse registro?\")' class='delete'>Delete</a>";
@@ -239,6 +233,7 @@ if(isset($_GET['action'])){
             echo "</tr>";
         }
     }
+    //se não for igual a 0 ele aparece uma tabela pois achou o dado
 ?>
 
     
